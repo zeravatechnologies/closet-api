@@ -5,7 +5,10 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
         KUBECONFIG_CRED = credentials('kubeconfig')
+        feature/initial-backend-scaffold
         DOCKER_HOST = "tcp://host.docker.internal:2375"
+
+
     }
 
     stages {

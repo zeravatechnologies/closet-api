@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: closet-api
+  namespace:  closet-prod 
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: closet-api
+  template:
+    metadata:
+      labels:
+        app: closet-api
+    spec:
+      containers:
+        - name: closet-api
+          image: zeravatechnologies/closet-api:v0.1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "test"

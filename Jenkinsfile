@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
-        KUBECONFIG_CRED = credentials('kubeconfig')
+        
      
         DOCKER_HOST = "tcp://host.docker.internal:2375"
 
@@ -38,11 +38,8 @@ pipeline {
 
         stage('Deploy to Kubernetes (Dev)') {
             steps {
-                script {
-                    // write kubeconfig from secret to a temp file
-                    writeFile file: 'kubeconfig.yaml', text: KUBECONFIG_CRED
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh """
-                      export KUBECONFIG=kubeconfig.yaml
                       kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev --record
                       kubectl rollout status deployment/closet-api -n closet-dev
                     """

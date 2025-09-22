@@ -29,8 +29,7 @@ spec:
 
     environment {
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
-        KUBECONFIG_CRED = credentials('kubeconfig')  // Jenkins secret
-    }
+
 
     stages {
         stage('Checkout') {
@@ -56,6 +55,7 @@ spec:
 
         stage('Deploy to Kubernetes (Dev)') {
             steps {
+
                 script {
                     // Save kubeconfig from Jenkins secret
                     writeFile file: 'kubeconfig.yaml', text: KUBECONFIG_CRED
@@ -65,6 +65,7 @@ spec:
                       kubectl rollout status deployment/closet-api -n closet-dev
                     """
                 }
+
             }
         }
     }

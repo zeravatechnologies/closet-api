@@ -10,10 +10,13 @@ spec:
     - name: kaniko
       image: gcr.io/kaniko-project/executor:v1.9.1
       command:
-        - /busybox/sh
+
+        - /kaniko/executor
       args:
-        - -c
-        - cat
+        - "--context=."
+        - "--dockerfile=Dockerfile"
+        - "--destination=zeravatechnologies/closet-api:dev"
+
       tty: true
       volumeMounts:
         - name: docker-config

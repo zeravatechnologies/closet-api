@@ -8,8 +8,11 @@ spec:
   containers:
 
     - name: kaniko
-      image: gcr.io/kaniko-project/executor:latest
+      image: gcr.io/kaniko-project/executor:v1.9.1
       command:
+        - /busybox/sh
+      args:
+        - -c
         - cat
       tty: true
       volumeMounts:

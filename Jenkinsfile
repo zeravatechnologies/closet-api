@@ -6,6 +6,7 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
+
     - name: kaniko
       image: gcr.io/kaniko-project/executor:latest
       command:
@@ -23,6 +24,7 @@ spec:
               items:
                 - key: .dockerconfigjson
                   path: config.json
+
 """
         }
     }
@@ -48,6 +50,7 @@ spec:
                       --dockerfile Dockerfile \
                       --destination=$DOCKER_IMAGE:dev \
                       --cleanup
+
                     """
                 }
             }
@@ -65,6 +68,7 @@ spec:
                       kubectl rollout status deployment/closet-api -n closet-dev
                     """
                 }
+
 
             }
         }

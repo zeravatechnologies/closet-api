@@ -1,14 +1,29 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: kaniko-secret
+      mountPath: /kaniko/.docker
+  volumes:
+  - name: kaniko-secret
+    secret:
+      secretName: dockerhub-creds
+"""
+        }
+    }
 
     environment {
-        DOCKER_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
-        KUBECONFIG_CRED = credentials('kubeconfig')
-     
-        DOCKER_HOST = "tcp://host.docker.internal:2375"
-
-
     }
 
     stages {
@@ -19,34 +34,26 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Image') {
             steps {
-                script {
-                    sh "docker build -t $DOCKER_IMAGE:dev ."
-                }
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
-                script {
-                    sh "echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin"
-                    sh "docker push $DOCKER_IMAGE:dev"
+                container('kaniko') {
+                    sh """
+                      /kaniko/executor \
+                        --context `pwd` \
+                        --dockerfile `pwd`/Dockerfile \
+                        --destination=$DOCKER_IMAGE:dev \
+                        --cache=true
+                    """
                 }
             }
         }
 
         stage('Deploy to Kubernetes (Dev)') {
             steps {
-                script {
-                    // write kubeconfig from secret to a temp file
-                    writeFile file: 'kubeconfig.yaml', text: KUBECONFIG_CRED
-                    sh """
-                      export KUBECONFIG=kubeconfig.yaml
-                      kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev --record
-                      kubectl rollout status deployment/closet-api -n closet-dev
-                    """
-                }
+                sh """
+                  kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
+                  kubectl rollout status deployment/closet-api -n closet-dev
+                """
             }
         }
     }

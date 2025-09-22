@@ -31,6 +31,7 @@ spec:
 
     environment {
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
+           }
 
 
     stages {
@@ -74,4 +75,4 @@ spec:
         }
     }
 }
-}
+

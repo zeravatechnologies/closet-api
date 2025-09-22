@@ -24,6 +24,7 @@ spec:
 
     environment {
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
+
     }
 
     stages {
@@ -50,10 +51,13 @@ spec:
 
         stage('Deploy to Kubernetes (Dev)') {
             steps {
+
                 sh """
                   kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
                   kubectl rollout status deployment/closet-api -n closet-dev
                 """
+
+
             }
         }
     }

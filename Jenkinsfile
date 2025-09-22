@@ -4,19 +4,15 @@ pipeline {
             yaml """
 apiVersion: v1
 kind: Pod
+metadata:
+  labels:
+    app: jenkins-kaniko
 spec:
   containers:
-
     - name: kaniko
-      image: gcr.io/kaniko-project/executor:v1.9.1
+      image: gcr.io/kaniko-project/executor:debug
       command:
-
-        - /kaniko/executor
-      args:
-        - "--context=."
-        - "--dockerfile=Dockerfile"
-        - "--destination=zeravatechnologies/closet-api:dev"
-
+        - cat
       tty: true
       volumeMounts:
         - name: docker-config
@@ -30,15 +26,13 @@ spec:
               items:
                 - key: .dockerconfigjson
                   path: config.json
-
 """
         }
     }
 
     environment {
         DOCKER_IMAGE = "zeravatechnologies/closet-api"
-           }
-
+    }
 
     stages {
         stage('Checkout') {
@@ -57,7 +51,6 @@ spec:
                       --dockerfile Dockerfile \
                       --destination=$DOCKER_IMAGE:dev \
                       --cleanup
-
                     """
                 }
             }
@@ -65,18 +58,13 @@ spec:
 
         stage('Deploy to Kubernetes (Dev)') {
             steps {
-
-                script {
-                    // Save kubeconfig from Jenkins secret
-                    writeFile file: 'kubeconfig.yaml', text: KUBECONFIG_CRED
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
                     sh """
-                      export KUBECONFIG=kubeconfig.yaml
+                      export KUBECONFIG=$KUBECONFIG_FILE
                       kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
                       kubectl rollout status deployment/closet-api -n closet-dev
                     """
                 }
-
-
             }
         }
     }

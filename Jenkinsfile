@@ -22,7 +22,9 @@ spec:
   
     - name: kubectl
 
-      image: bitnami/:1.34.0   # ✅ use a kubectl image, match version to your cluster
+
+      image: bitnami/kubectl:1.34.0   # ✅ use a kubectl image, match version to your cluster
+
 
       command:
         - cat

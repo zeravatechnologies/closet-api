@@ -21,7 +21,7 @@ spec:
           mountPath: /kaniko/.docker
   
     - name: kubectl
-      image: bitnami/kubectl:1.34   # ✅ use a kubectl image, match version to your cluster
+      image: bitnami/:1.34.0   # ✅ use a kubectl image, match version to your cluster
       command:
         - cat
       tty: true    

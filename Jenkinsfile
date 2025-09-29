@@ -24,7 +24,9 @@ spec:
 
 
 
+
       image: registry.k8s.io/kubectl:v1.34.0
+
    # ✅ use a kubectl image, match version to your cluster
 
 

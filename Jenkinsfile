@@ -23,8 +23,10 @@ spec:
     - name: kubectl
 
 
+
       image: bitnami/kubectl:1.10.11-ol-7
    # ✅ use a kubectl image, match version to your cluster
+
 
 
       command:

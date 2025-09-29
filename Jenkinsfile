@@ -19,6 +19,13 @@ spec:
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
+  
+    - name: kubectl
+      image: bitnami/kubectl:1.34   # ✅ use a kubectl image, match version to your cluster
+      command:
+        - cat
+      tty: true    
+  
   volumes:
     - name: docker-config
       projected:

@@ -29,9 +29,6 @@ spec:
 
 
 
-      command:
-        - cat
-      tty: true    
   
   volumes:
     - name: docker-config

@@ -61,18 +61,20 @@ spec:
             }
         }
 
-        stage('Deploy to Kubernetes (Dev)') {
-            steps {
-                container('kubectl') {   // ✅ run inside kubectl container
-                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
-                        sh """
-                          export KUBECONFIG=$KUBECONFIG_FILE
-                          kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
-                          kubectl rollout status deployment/closet-api -n closet-dev
-                        """
-                    }
-                }
-            }
-        }
+
+		stage('Deploy to Kubernetes (Dev)') {
+		    steps {
+		        container('kubectl') {
+		            withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+		                sh '''
+		                  kubectl get nodes
+		                  kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
+		                  kubectl rollout status deployment/closet-api -n closet-dev
+		                '''
+		            }
+		        }
+		    }
+		}
+
     }
 }

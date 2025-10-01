@@ -12,26 +12,16 @@ spec:
     - name: kaniko
       image: gcr.io/kaniko-project/executor:debug
       command:
-
         - cat
-
       tty: true
       volumeMounts:
         - name: docker-config
           mountPath: /kaniko/.docker
   
     - name: kubectl
+      image: zeravatechnologies/kubectl:1.34.0-debug      # ✅ switched to debug-friendly kubectl image
+      tty: true
 
-
-
-
-      image: registry.k8s.io/kubectl:v1.34.0
-
-   # ✅ use a kubectl image, match version to your cluster
-
-
-
-  
   volumes:
     - name: docker-config
       projected:
@@ -73,12 +63,14 @@ spec:
 
         stage('Deploy to Kubernetes (Dev)') {
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
-                    sh """
-                      export KUBECONFIG=$KUBECONFIG_FILE
-                      kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
-                      kubectl rollout status deployment/closet-api -n closet-dev
-                    """
+                container('kubectl') {   // ✅ run inside kubectl container
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                        sh """
+                          export KUBECONFIG=$KUBECONFIG_FILE
+                          kubectl set image deployment/closet-api closet-api=$DOCKER_IMAGE:dev -n closet-dev
+                          kubectl rollout status deployment/closet-api -n closet-dev
+                        """
+                    }
                 }
             }
         }

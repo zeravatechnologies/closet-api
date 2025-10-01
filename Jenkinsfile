@@ -61,6 +61,7 @@ spec:
             }
         }
 
+
 		stage('Deploy to Kubernetes (Dev)') {
 		    steps {
 		        container('kubectl') {
@@ -74,5 +75,6 @@ spec:
 		        }
 		    }
 		}
+
     }
 }
